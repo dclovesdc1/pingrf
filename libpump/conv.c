@@ -243,8 +243,13 @@ convC2P(Pcall *c, uint8 *ap/*[Npkt]]*/)
 		break;
 
 	case Tclearwarn:
+#if	0
 		*p++ = 0xa7;
 		*p++ = 0x01;
+#else
+		*p++ = 0xb0;
+		*p++ = 0x01;
+#endif
 		break;
 	}
 	

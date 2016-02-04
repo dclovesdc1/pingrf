@@ -120,8 +120,11 @@ main(int argc, char **argv)
 		}else{
 			print("	No combo active\n");
 		}
-		if(ps.haswarning)
-			print("	WARNING ACTIVE\n");
+		if(ps.haswarning) {
+			print("	WARNING ACTIVE; clearing\n");
+			if(pclearwarning() < 0)
+				print("failed to clear");
+		}
 	}else if(strcmp(argv[0], "clearwarning") == 0){
 		if(pclearwarning() < 0)
 			panic("pclearwarning: %r");
