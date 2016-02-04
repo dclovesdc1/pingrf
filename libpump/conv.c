@@ -192,10 +192,17 @@ convC2P(Pcall *c, uint8 *ap/*[Npkt]]*/)
 	default:	break;
 
 	case Twakeup:
+#if	0
 		*p++ = 0x49;
 		*p++ = 0x01;
 		*p++ = 0x2d;
 		*p++ = 0x14;
+#else
+		*p++ = 0x48;
+		*p++ = 0x00;
+		*p++ = 0x2f;
+		*p++ = 0x14;
+#endif
 		break;
 
 	case Tcombo:
@@ -205,7 +212,14 @@ convC2P(Pcall *c, uint8 *ap/*[Npkt]]*/)
 			return -1;
 		}
 
+#if	0
 		*p++ = 0x01;
+#else
+		if (c->combo.minutes == 0)
+			*p++ = 0x00;
+		else
+			*p++ = 0x00;
+#endif
 		*p++ = 0x00;
 
 		/* They seem to be in "extra careful" mode here. */
@@ -213,7 +227,15 @@ convC2P(Pcall *c, uint8 *ap/*[Npkt]]*/)
 		p += 2;
 		U16PUTLE(p, 0xffff^c->combo.insulin);
 		p += 2;
+
+#if	0
 		*p++ = c->combo.minutes/6;
+#else
+		if (c->combo.minutes == 0)
+			*p++ = 0;
+		else
+			*p++ = c->combo.minutes/6;
+#endif
 		
 		/* zeroes! (for now) */
 		p += 28-7;

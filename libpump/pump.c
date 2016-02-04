@@ -76,7 +76,15 @@ pcombo(uint insulin, uint minutes)
 	if(_pcall(&tx, &rx) != 1)
 		return -1;
 
+#if	0
 	tx.type = Tack1;
+#else
+	if (minutes == 0) {
+		tx.type = Tack0;
+	} else {
+		tx.type = Tack1;
+	}
+#endif
 	if(_pcall(&tx, &rx) != 1)
 		return -1;
 

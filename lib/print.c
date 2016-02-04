@@ -230,14 +230,14 @@ vseprint(char *dst, char *edst, char *fmt, va_list arg)
 								luv = va_arg(fmtarg.arg, int);
 						}
 					}
-
+					
 					if(!(fl&FlagUnsigned) && (vlong)luv < 0){
 						neg = 1;
 						luv = -luv;
 					}
 
 					if(neg) w = printstr(w, edst, "-", 1);
-					w = seprint(w, edst, "%ulld.%3ulld", luv/1000, luv%1000);
+					w = seprint(w, edst, "%ulld.%03d", luv/1000, luv%1000);
 
 					goto break2;
 				}
