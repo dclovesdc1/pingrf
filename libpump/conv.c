@@ -45,6 +45,30 @@ convP2C(uint8 *ap, Pcall *c)
 	c->err = Eok;
 	switch(c->type){
 	default: break;
+	
+	case Rkeepalive:
+		c->backoffms = U16GETLE(p);
+		break;
+		
+	case Rbolus:
+	{
+		Mbolus *b = &c->bolus;
+		p += 2;
+		b->insulin = U16GETLE(p);
+		p += 2;
+		b->minutes = U16GETLE(p)*6;
+		break;
+	}
+	
+	case Rdeliverystatus:
+	{
+		p += 1;
+		switch(*p){
+		case 0x01:	c->deliverystatus = DeliveryBusy; break;
+		case 0x02:	c->deliverystatus = DeliveryDone; break;
+		default:		c->deliverystatus = DeliveryUnknown; break;
+		}
+	}
 
 	/* TODO: check against sizes */
 	case Rstatus:
@@ -149,8 +173,9 @@ convP2C(uint8 *ap, Pcall *c)
 
 	/* Fill status bits where we (think) we have them. */
 	switch(c->type){
-	case Rcombo:
+	case Rbolus:
 	case R2c:
+	case Rdeliverystatus:
 	case Rstatus:
 		if(p[0] & BIT(4))
 			c->flag |= Fwarn;	
@@ -163,7 +188,7 @@ convP2C(uint8 *ap, Pcall *c)
 
 static uint sizeC2P[256] = {
 	[Twakeup] = 4,
-	[Tcombo] = 28,
+	[Tbolus] = 28,
 	[Tclearwarn] = 2,
 };
 
@@ -212,38 +237,23 @@ convC2P(Pcall *c, uint8 *ap/*[Npkt]]*/)
 #endif
 		break;
 
-	case Tcombo:
-		if(c->combo.minutes % 6 != 0){
+	case Tbolus:
+		if(c->bolus.minutes % 6 != 0){
 			/* The pump does not seem to accept other durations. */
 			werrstr("combo duration must be a multiple of 6");
 			return -1;
 		}
 
-#if	0
-		*p++ = 0x01;
-#else
-		if (c->combo.minutes == 0)
-			*p++ = 0x00;
-		else
-			*p++ = 0x00;
-#endif
+		*p++ = c->bolus.minutes == 0 ? 0x00 : 0x01;
 		*p++ = 0x00;
 
 		/* They seem to be in "extra careful" mode here. */
-		U16PUTLE(p, c->combo.insulin);
+		U16PUTLE(p, c->bolus.insulin);
 		p += 2;
-		U16PUTLE(p, 0xffff^c->combo.insulin);
+		U16PUTLE(p, 0xffff^c->bolus.insulin);
 		p += 2;
+		*p++ = c->bolus.minutes/6;
 
-#if	0
-		*p++ = c->combo.minutes/6;
-#else
-		if (c->combo.minutes == 0)
-			*p++ = 0;
-		else
-			*p++ = c->combo.minutes/6;
-#endif
-		
 		/* zeroes! (for now) */
 		p += 28-7;
 
