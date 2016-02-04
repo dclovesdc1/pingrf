@@ -84,6 +84,11 @@ typedef struct
 	uint minutes;
 } Mcombo;
 
+typedef struct
+{
+	uint type;
+} Mwarning;
+
 enum
 {
 	Eok = 0,
@@ -154,6 +159,12 @@ enum
 	Fwarn = 1
 };
 
+enum
+{
+	Twarning_0 = 0,
+	Twarning_1 = 1,
+};
+
 typedef struct
 {
 	int type;
@@ -171,6 +182,7 @@ typedef struct
 		Mstatus3 status3;
 		Mstatus4 status4;
 		Mcombo combo;
+		Mwarning warning;
 	};
 } Pcall;
 

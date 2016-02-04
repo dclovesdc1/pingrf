@@ -122,12 +122,16 @@ main(int argc, char **argv)
 		}
 		if(ps.haswarning) {
 			print("	WARNING ACTIVE; clearing\n");
-			if(pclearwarning() < 0)
-				print("failed to clear");
+			if(pclearwarning0() < 0)
+				print("failed to clear0");
+			if(pclearwarning1() < 0)
+				print("failed to clear1");
 		}
 	}else if(strcmp(argv[0], "clearwarning") == 0){
-		if(pclearwarning() < 0)
-			panic("pclearwarning: %r");
+		if(pclearwarning0() < 0)
+			panic("pclearwarning0: %r");
+		if(pclearwarning1() < 0)
+			panic("pclearwarning1: %r");
 	}else if(strcmp(argv[0], "combo") == 0){
 		if(argc != 3)
 			usage();

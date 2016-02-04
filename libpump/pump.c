@@ -120,12 +120,39 @@ pcancel()
 }
 
 int
-pclearwarning()
+pclearwarning0()
 {
+	static Pcall tx, rx;
+
 	if(_presume() < 0)
 		return -1;
 
+#if	0
 	if(_pcallsimple(Tclearwarn) < 0)
+		return -1;
+#else
+	tx.type = Tclearwarn;
+	tx.warning.type = Twarning_0;
+	if(_pcall(&tx, &rx) != 1)
+		return -1;
+#endif
+	
+	_padjourn();
+
+	return 0;
+}
+
+int
+pclearwarning1()
+{
+	static Pcall tx, rx;
+
+	if(_presume() < 0)
+		return -1;
+
+	tx.type = Tclearwarn;
+	tx.warning.type = Twarning_1;
+	if(_pcall(&tx, &rx) != 1)
 		return -1;
 	
 	_padjourn();
