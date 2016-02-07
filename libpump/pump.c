@@ -93,14 +93,11 @@ pbolus(uint insulin, uint minutes)
 
 		switch(rx.deliverystatus){
 		case DeliveryBusy:
+		case DeliveryUnknown:
 			tx.type = Tdeliverycontinue;
 			if(_pcall(&tx, &rx) != 1)
 				return -1;
 			continue;
-		
-		case DeliveryUnknown:
-			werrstr("unknown delivery status");
-			return -1;
 		
 		case DeliveryDone:
 			break;

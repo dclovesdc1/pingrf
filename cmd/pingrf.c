@@ -1,6 +1,9 @@
 
 #include "impl.h"
 
+#define	BOLUS_INC_U	0.05
+#define BOLUS_INC_P	50
+
 char *argv0;
 
 /* char *ttypath = "/dev/tty.usbserial"; */
@@ -138,8 +141,14 @@ main(int argc, char **argv)
 
 		insulin = strtof(argv[1], nil);
 		hours = strtof(argv[2], nil);
-		
-		if(pbolus((uint)(insulin*1000.0), (uint)(hours*60)) < 0)
+	
+		uint multiples = (insulin / BOLUS_INC_U);
+		if (insulin - (multiples * BOLUS_INC_U) > BOLUS_INC_U / 2) {
+			multiples++;
+		}
+		uint bolus_p = multiples * BOLUS_INC_P;
+
+		if(pbolus(bolus_p, (uint)(hours*60)) < 0)
 			panic("pbolus: %r");
 
 		print("ok\n");
