@@ -39,13 +39,25 @@ printinit()
 	// UART, defaults.
 	U1CSR = U1CSR_MODE;
 
+#ifdef	CC1111
+	// USART1 Alt. 1
+	PERCFG = (PERCFG & ~PERCFG_U1CFG) | PERCFG_U0CFG;
+	P0SEL |= BIT(2) | BIT(3) | BIT(4) | BIT(5);
+#else
 	// USART1 Alt. 2
 	PERCFG = (PERCFG & ~PERCFG_U0CFG) | PERCFG_U1CFG;
 	P1SEL |= BIT(4) | BIT(5) | BIT(6) | BIT(7);
+#endif
 
+#ifdef	CC1111
+	// Baudrate = 57.6 (U1BAUD.BAUD_M = 131, U1GCR.BAUD_E = 8)
+	U1BAUD = 59;
+	U1GCR = (U1GCR & ~U1GCR_BAUD_E) | 11; 
+#else
 	// Baudrate = 57.6 kbps (U1BAUD.BAUD_M = 34, U1GCR.BAUD_E = 11)
 	U1BAUD = 34;
 	U1GCR = (U1GCR & ~U1GCR_BAUD_E) | 11; 
+#endif
 
 	U1UCR |= U1UCR_FLUSH;
 	// U1UCR |= U1UCR_FLOW;

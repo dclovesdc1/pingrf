@@ -14,14 +14,19 @@ LDFLAGS_FLASH = \
 CFLAGS += -I../lib/8051
 CFLAGS += -I../lib
 CFLAGS += -I..
-CFLAGS += -DCC1110
 
 SRC = main.c rf.c timer.c call.c callrx.c calltx.c calltxrx.c callping.c cobs.c u.c conv.c
 
+ifdef CC1111
+CFLAGS += -DCC1111
+SRC += usbsrv.c
+else
+CFLAGS += -DCC1110
 ifdef UART
 SRC += uartsrv.c
 else
 SRC += spisrv.c
+endif
 endif
 
 ifdef DEBUG
