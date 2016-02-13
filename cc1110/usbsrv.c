@@ -13,6 +13,7 @@ enum
 void
 srvinit()
 {
+	configure_serial();
 }
 
 void

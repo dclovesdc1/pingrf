@@ -12,6 +12,10 @@ void t1intr(void) __interrupt T1_VECTOR;
 void uart1txintr(void) __interrupt UTX1_VECTOR;
 #endif
 
+#ifdef CC1111
+void usb_isr() __interrupt 6;
+#endif
+
 // This needs to stay in the data segment so that we
 // have atomic clear-and-set.
 volatile uint8 flag;
@@ -55,7 +59,11 @@ main(void)
 	await(SLEEP & SLEEP_XOSC_S);
 
 	// Configure P1.0, P1.1 to output. (LEDs)
+#ifdef	CC1111
+	P1DIR |= BIT(1);
+#else
 	P1DIR |= BIT(0) | BIT(1);
+#endif
 
 	printinit();
 	srvinit();

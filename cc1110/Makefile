@@ -14,12 +14,14 @@ LDFLAGS_FLASH = \
 CFLAGS += -I../lib/8051
 CFLAGS += -I../lib
 CFLAGS += -I..
+CFLAGS += -I.
 
 SRC = main.c rf.c timer.c call.c callrx.c calltx.c calltxrx.c callping.c cobs.c u.c conv.c
 
 ifdef CC1111
 CFLAGS += -DCC1111
-SRC += usbsrv.c
+CFLAGS += -DTI_DONGLE
+SRC += usbsrv.c usb.c hal.c usb_descriptors.c serial.c
 else
 CFLAGS += -DCC1110
 ifdef UART
@@ -56,6 +58,7 @@ PAOM=$(addprefix $(OBJ)/, $(PROGS:.hex=))
 vpath %.c .
 vpath %.c ../lib
 vpath %.c ../libradio
+vpath %.c ../libusb
 
 all: $(OBJ)/ping.hex
 

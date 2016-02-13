@@ -24,7 +24,11 @@ typedef int	int16;
 typedef unsigned long	uint32;
 typedef long	int32;
 
+#ifdef	CC1111
+#define GREEN P1_1
+#else
 #define GREEN P1_0
+#endif
 #define RED P1_1
 
 #define PACKEDSTRUCT
