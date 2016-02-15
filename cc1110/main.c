@@ -3,8 +3,10 @@
 void rftxrxintr(void) __interrupt RFTXRX_VECTOR;
 void rfrfintr(void) __interrupt RF_VECTOR;
 
+#ifndef	CC1111
 void utx0intr(void) __interrupt UTX0_VECTOR;
 void urx0intr(void) __interrupt URX0_VECTOR;
+#endif
 
 void t1intr(void) __interrupt T1_VECTOR;
 
@@ -76,7 +78,7 @@ main(void)
 	EA = 1;
 
 	dprint("pingrf started.\n");
-	
+
 	srvrx();
 	for(;;){
 		if(flag&Fpanic){
@@ -169,6 +171,8 @@ main(void)
 Rcall*
 peekcall()
 {
+	srvrxpeak();
+
 	if(curcall.type == Nop && (flag&Frxcall)){
 		srvrxlower();
 		flag &= ~Frxcall;

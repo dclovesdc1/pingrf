@@ -21,6 +21,7 @@ SRC = main.c rf.c timer.c call.c callrx.c calltx.c calltxrx.c callping.c cobs.c 
 ifdef CC1111
 CFLAGS += -DCC1111
 CFLAGS += -DTI_DONGLE
+CFLAGS += -I../libusb
 SRC += usbsrv.c usb.c hal.c usb_descriptors.c serial.c
 else
 CFLAGS += -DCC1110
