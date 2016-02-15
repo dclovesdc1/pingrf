@@ -65,6 +65,10 @@ srvrxlower()
 {/*no-op*/}
 
 void
+srvrxpeek()
+{/*no-op*/}
+
+void
 urx0intr(void) __interrupt URX0_VECTOR
 {
 	static uint8 byte;

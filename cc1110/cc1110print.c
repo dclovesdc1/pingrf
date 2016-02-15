@@ -42,7 +42,7 @@ printinit()
 #ifdef	CC1111
 	// USART1 Alt. 1
 	PERCFG = (PERCFG & ~PERCFG_U1CFG) | PERCFG_U0CFG;
-	P0SEL |= BIT(2) | BIT(3) | BIT(4) | BIT(5);
+	P0SEL |= BIT(4) | BIT(5);
 #else
 	// USART1 Alt. 2
 	PERCFG = (PERCFG & ~PERCFG_U0CFG) | PERCFG_U1CFG;

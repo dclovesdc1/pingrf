@@ -12,7 +12,6 @@ static volatile uint8 nrx, ntx;
 void
 srvinit()
 {
-  setup_led( );
   usb_init( );
   usb_enable( );
   usb_up( );
@@ -27,7 +26,7 @@ srvrx()
 }
 
 void
-srvrxpeak()
+srvrxpeek()
 {
 	uint8 length;
 	uint8 in_byte;

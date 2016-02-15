@@ -91,6 +91,10 @@ srvrxlower()
 }
 
 void
+srvrxpeek()
+{ /* no-op */ }
+
+void
 srvprintstate()
 {
 	dprint("rxstate=%d txstate=%d ntx=%d nrx=%d\n", rxstate, txstate, ntx, nrx);

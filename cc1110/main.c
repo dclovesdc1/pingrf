@@ -171,7 +171,7 @@ main(void)
 Rcall*
 peekcall()
 {
-	srvrxpeak();
+	srvrxpeek();
 
 	if(curcall.type == Nop && (flag&Frxcall)){
 		srvrxlower();
