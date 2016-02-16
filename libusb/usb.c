@@ -347,6 +347,24 @@ void usb_putchar(char c) __reentrant
     usb_in_send();
 }
 
+int usb_is_char_present()
+{
+  char c;
+  if (usb_out_bytes == 0) {
+    USBINDEX = USB_OUT_EP;
+    if ((USBCSOL & USBCSOL_OUTPKT_RDY) == 0)
+      return 0;
+    usb_out_bytes = (USBCNTH << 8) | USBCNTL;
+    if (usb_out_bytes == 0) {
+      USBINDEX = USB_OUT_EP;
+      USBCSOL &= ~USBCSOL_OUTPKT_RDY;
+      return 0;
+    }
+  }
+
+  return usb_out_bytes;
+}
+
 char usb_pollchar()
 {
   char c;

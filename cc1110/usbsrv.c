@@ -30,30 +30,40 @@ srvrxpeek()
 {
 	uint8 length;
 	uint8 in_byte;
+	int bytes_to_read;
 
-	in_byte = usb_pollchar();
+	if ((bytes_to_read = usb_is_char_present()) > 0) {
+		in_byte = usb_getchar();
 
-	if (in_byte != (uint8) USB_READ_AGAIN) {
 		if (nrx == 0) {
+			if (in_byte == 0) {
+				dprint("getting 0 size. error\n");
+				return;
+			}
+
 			// if the index is still at 0, here is the length
 			dprint("\nrcv length : %d\n", in_byte);
+			dprint("0x%x ", in_byte);
 			rxcall[nrx++] = in_byte;
 		}
 
 		length = rxcall[0];
 		while (nrx < length) {
-			if ((in_byte = usb_pollchar()) == (uint8) USB_READ_AGAIN) {
+			if ((bytes_to_read = usb_is_char_present()) > 0) {
+				in_byte = usb_getchar();
+
+				dprint("0x%x ", in_byte);
+				rxcall[nrx++] = in_byte;
+				if(nrx == sizeof rxcall)
+					panic("usb: rxcall overrun");
+			} else {
 				return;
 			}
-
-			dprint("0x%x ", in_byte);
-			rxcall[nrx++] = in_byte;
-			if(nrx == sizeof rxcall)
-				panic("usb: rxcall overrun");
 		}
 
 		if (nrx == length) {
 			flag |= Frxcall;
+			dprint("\n");
 		}
 	}
 }
