@@ -1,9 +1,8 @@
 #include "a.h"
-#define uint32_t uint32
-#define uint16_t uint16
-#define uint8_t uint8
-
+#include "stdint.h"
 #include "usb.h"
+#include "intel_hex.h"
+
 /*
 */
 
@@ -25,68 +24,82 @@ srvrx()
 	nrx = 0;
 }
 
-void
-srvrxpeek()
-{
-	uint8 length;
-	uint8 in_byte;
-	int bytes_to_read;
-
-	if ((bytes_to_read = usb_is_char_present()) > 0) {
-		in_byte = usb_getchar();
-
-		if (nrx == 0) {
-			if (in_byte == 0) {
-				dprint("getting 0 size. error\n");
-				return;
-			}
-
-			// if the index is still at 0, here is the length
-			dprint("\nrcv length : %d\n", in_byte);
-			dprint("0x%x ", in_byte);
-			rxcall[nrx++] = in_byte;
-		}
-
-		length = rxcall[0];
-		while (nrx < length) {
-			if ((bytes_to_read = usb_is_char_present()) > 0) {
-				in_byte = usb_getchar();
-
-				dprint("0x%x ", in_byte);
-				rxcall[nrx++] = in_byte;
-				if(nrx == sizeof rxcall)
-					panic("usb: rxcall overrun");
-			} else {
-				return;
-			}
-		}
-
-		if (nrx == length) {
-			flag |= Frxcall;
-			dprint("\n");
-		}
-	}
-}
-
-void
+int
 srvrxlower()
 {
+	uint8_t length;
+	uint8_t in_byte;
+	char nibbles[2];
+	int bytes_to_read;
+
+	nibbles[0] = usb_getchar();
+	nibbles[1] = usb_getchar();
+	in_byte = hex8(&nibbles[0]);
+
+	if (nrx == 0) {
+		if (in_byte == 0) {
+			dprint("getting 0 size. error\n");
+			flag &= ~Frxcall;
+			return -1;
+		}
+
+		if (in_byte == 0xff) {
+			dprint("radio reset\n");
+			flag &= ~Frxcall;
+			return -2;
+		}
+
+		// if the index is still at 0, here is the length
+		rxcall[nrx++] = in_byte;
+	}
+
+	length = rxcall[0];
+	while (nrx < length) {
+		nibbles[0] = usb_getchar();
+		nibbles[1] = usb_getchar();
+		in_byte = hex8(&nibbles[0]);
+
+		rxcall[nrx++] = in_byte;
+		if(nrx == sizeof rxcall)
+			panic("usb: rxcall overrun");
+	}
+
+	if (nrx == length) {
+		flag |= Frxcall;
+	}
+
+	return 0;
 }
+
+void
+srvpending()
+{
+	flag |= Frxcall;
+}
+
+//void
+//srvrxlower()
+//{
+//}
 
 void
 srvtx()
 {
 	int i;
 	uint8 length;
+	char txcall_in_ascii[SPIMAX * 2];
+	int ascii_idx;
 
 	flag &= ~Ftxcall;
 	length = txcall[0];
-	dprint("\nsending %d bytes\n", length);
+
 	for (ntx = 0; ntx < length; ntx++) {
-		dprint("0x%x ", txcall[ntx]);
-		usb_putchar(txcall[ntx]);
+		to_hex8_ascii(&txcall_in_ascii[ntx * 2], txcall[ntx]);
 	}
-	dprint("\n");
+
+	for (ascii_idx = 0; ascii_idx < length * 2; ascii_idx++) {
+		usb_putchar(txcall_in_ascii[ascii_idx]);
+	}
 	usb_flush( );
 	flag |= Ftxcall;
 }

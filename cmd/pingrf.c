@@ -1,6 +1,10 @@
 
 #include "impl.h"
 
+#ifdef	CC1111
+#include "intel_hex.h"
+#endif
+
 #define	BOLUS_INC_U	0.05
 #define BOLUS_INC_P	50
 
@@ -17,6 +21,7 @@ int debug = 0;
 void usage();
 void opentty();
 
+ssize_t write_serial(int fd, const void *buf, size_t count); 
 int 	rcallwrite(void *p, uint n);
 void	chkadd(char *v, char *chk);
 void	call(int type);
@@ -295,12 +300,39 @@ rcallimpl(Rcall *tx, Rcall *rx)
 	return 0;
 }
 
+ssize_t
+write_serial(int fd, const void *buf, size_t n)
+{
+#ifdef	CC1111
+	int i;
+	int nw;
+	char buf_ascii[256];
+	char *buf_byte = (char *)buf;
+	for (i = 0; i < n; i++) {
+		to_hex8_ascii(&buf_ascii[i * 2], buf_byte[i]);
+	}
+
+	nw = write(fd, buf_ascii, n * 2);
+
+	if (nw < 0) {	
+		return -1;
+	} else if (nw != n * 2) {
+		errno = EIO;
+		return -1;
+	}
+
+	return n;
+#else
+	return (write(fd, buf, n));
+#endif
+}
+
 int 
 rcallwrite(void *p, uint n)
 {
 	int nw, tmp;
 
-	if((nw = write(tty, p, n)) < 0){
+	if((nw = write_serial(tty, p, n)) < 0){
 		return -1;
 	}else if(nw != n){
 		errno = EIO;
@@ -360,7 +392,7 @@ radioreset()
 {
 	static uint8 ff = 0xff;
 	
-	if(write(tty, &ff, 1) < 0)
+	if(write_serial(tty, &ff, 1) < 0)
 		return -1;
 	
 	usleep(250*1000);

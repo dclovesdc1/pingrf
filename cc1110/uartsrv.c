@@ -60,13 +60,11 @@ srvrx()
 //	U0CSR |= U0CSR_RE;
 }
 
-void
+int
 srvrxlower()
-{/*no-op*/}
-
-void
-srvrxpeek()
-{/*no-op*/}
+{
+	return 0;
+}
 
 void
 urx0intr(void) __interrupt URX0_VECTOR

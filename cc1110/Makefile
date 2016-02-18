@@ -6,10 +6,15 @@ CFLAGS = --model-large --opt-code-size --std-c99
 LDFLAGS_FLASH = \
 	 --std-c99  \
 	--out-fmt-ihx \
-	--code-loc 0x000 --code-size 0x8000 \
 	--xram-loc 0xf000  \
 	--iram-size 0x100 \
 	--xram-size 0x0f00 \
+
+ifdef CCLOADER
+LDFLAGS_FLASH += --code-loc 0x1400 --code-size 0x8000
+else
+LDFLAGS_FLASH += --code-loc 0x000 --code-size 0x8000
+endif
 
 CFLAGS += -I../lib/8051
 CFLAGS += -I../lib
@@ -22,7 +27,7 @@ ifdef CC1111
 CFLAGS += -DCC1111
 CFLAGS += -DTI_DONGLE
 CFLAGS += -I../libusb
-SRC += usbsrv.c usb.c hal.c usb_descriptors.c
+SRC += usbsrv.c usb.c hal.c usb_descriptors.c intel_hex.c
 else
 CFLAGS += -DCC1110
 ifdef UART

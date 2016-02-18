@@ -88,11 +88,8 @@ void
 srvrxlower()
 {
 	unstuff(rxh, rxcall, nrx);
+	return 0;
 }
-
-void
-srvrxpeek()
-{ /* no-op */ }
 
 void
 srvprintstate()

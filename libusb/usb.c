@@ -297,6 +297,11 @@ void usb_isr() __interrupt 6
   usb_iif |= USBIIF;
   usb_ep0();
 
+  // if something came from the host. let it be known
+  if (USBOIF & (1 << USB_OUT_EP)) {
+     srvpending();
+  }
+
   if (USBCIF & USBCIF_RSTIF)
     usb_set_interrupts();
 }
@@ -345,24 +350,6 @@ void usb_putchar(char c) __reentrant
   USBFIFO[USB_IN_EP << 1] = c;
   if (++usb_in_bytes == USB_IN_SIZE)
     usb_in_send();
-}
-
-int usb_is_char_present()
-{
-  char c;
-  if (usb_out_bytes == 0) {
-    USBINDEX = USB_OUT_EP;
-    if ((USBCSOL & USBCSOL_OUTPKT_RDY) == 0)
-      return 0;
-    usb_out_bytes = (USBCNTH << 8) | USBCNTL;
-    if (usb_out_bytes == 0) {
-      USBINDEX = USB_OUT_EP;
-      USBCSOL &= ~USBCSOL_OUTPKT_RDY;
-      return 0;
-    }
-  }
-
-  return usb_out_bytes;
 }
 
 char usb_pollchar()

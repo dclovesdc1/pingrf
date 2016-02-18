@@ -171,10 +171,10 @@ main(void)
 Rcall*
 peekcall()
 {
-	srvrxpeek();
-
 	if(curcall.type == Nop && (flag&Frxcall)){
-		srvrxlower();
+		if (srvrxlower() != 0)
+			return &curcall;
+
 		flag &= ~Frxcall;
 
 		if(convM2R(rxcall, sizeof rxcall, &curcall) == 0)

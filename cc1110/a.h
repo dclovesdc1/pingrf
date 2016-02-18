@@ -65,7 +65,7 @@ void spitx(uint8 c);
 void srvinit();
 void srvrx();
 void srvtx();
-void srvrxlower();
+int srvrxlower();
 
 #define SPIMAX (RCALLMAX+2)
 
