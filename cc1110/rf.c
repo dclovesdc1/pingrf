@@ -63,7 +63,7 @@ rfinit()
 	PA_TABLE1 = 0x00;
 #endif
 
-#if 1
+#ifndef	CC1111
 	SYNC1 = 0xd3;
 	SYNC0 = 0x91;
 	PKTCTRL1 = 0xC0; // Packet Automation Control 
@@ -101,6 +101,43 @@ rfinit()
 	MCSM2 = 0x07;
 	MCSM1 = 0x30;  //  0x3f: continues RX after TX, RX.
 	MCSM0 = 0x18;
+#else
+	SYNC1 = 0xd3;
+	SYNC0 = 0x91;
+	PKTLEN = Npkt;
+	PKTCTRL1 = 0x40;
+	PKTCTRL0 = 0x00;
+	//ADDR = 0x00;
+	CHANNR = 0x00;
+	FSCTRL1 = 0x0c;
+	FSCTRL0 = 0x00;
+	FREQ2 = 0x26;
+	FREQ1 = 0x15;
+	FREQ0 = 0x36;
+	MDMCFG4 = 0xb9;
+	MDMCFG3 = 0xa3;
+	MDMCFG2 = 0x01;
+	MDMCFG1 = 0x23;
+	MDMCFG0 = 0xa0;
+	DEVIATN = 0x33;
+	MCSM2 = 0x07;
+	//MCSM1 = 0x0f;
+	MCSM1 = 0x30;
+	MCSM0 = 0x18;
+	FOCCFG = 0x17;
+
+	//BSCFG = 0x6c;
+	//FREND1 = 0xb6;
+	//FREND0 = 0x10;
+
+	FSCAL3 = 0xef;
+	FSCAL2 = 0x2b;
+	FSCAL1 = 0x2f;
+	FSCAL0 = 0x1f;
+	TEST1 = 0x31;
+	TEST0 = 0x09;
+	PA_TABLE0 = 0xc0;
+	PA_TABLE1 = 0x00;
 #endif
 
 

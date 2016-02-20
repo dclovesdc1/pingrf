@@ -21,7 +21,7 @@ int debug = 0;
 void usage();
 void opentty();
 
-ssize_t write_serial(int fd, const void *buf, size_t count); 
+ssize_t writen(int fd, const void *buf, size_t count); 
 int 	rcallwrite(void *p, uint n);
 void	chkadd(char *v, char *chk);
 void	call(int type);
@@ -256,7 +256,12 @@ opentty()
 int
 rcallimpl(Rcall *tx, Rcall *rx)
 {
+#ifdef	CC1111
+	// we are sending/receiving hex chars in CC1111
+	uint8 buf[RCALLMAX * 2];
+#else
 	uint8 buf[RCALLMAX];
+#endif
 
 	dprint("tx %R\n", tx);
 	dprinthex(tx->pkt, 8+tx->pkt[3]);
@@ -300,39 +305,12 @@ rcallimpl(Rcall *tx, Rcall *rx)
 	return 0;
 }
 
-ssize_t
-write_serial(int fd, const void *buf, size_t n)
-{
-#ifdef	CC1111
-	int i;
-	int nw;
-	char buf_ascii[256];
-	char *buf_byte = (char *)buf;
-	for (i = 0; i < n; i++) {
-		to_hex8_ascii(&buf_ascii[i * 2], buf_byte[i]);
-	}
-
-	nw = write(fd, buf_ascii, n * 2);
-
-	if (nw < 0) {	
-		return -1;
-	} else if (nw != n * 2) {
-		errno = EIO;
-		return -1;
-	}
-
-	return n;
-#else
-	return (write(fd, buf, n));
-#endif
-}
-
 int 
 rcallwrite(void *p, uint n)
 {
 	int nw, tmp;
 
-	if((nw = write_serial(tty, p, n)) < 0){
+	if((nw = writen(tty, p, n)) < 0){
 		return -1;
 	}else if(nw != n){
 		errno = EIO;
@@ -392,7 +370,7 @@ radioreset()
 {
 	static uint8 ff = 0xff;
 	
-	if(write_serial(tty, &ff, 1) < 0)
+	if(writen(tty, &ff, 1) < 0)
 		return -1;
 	
 	usleep(250*1000);

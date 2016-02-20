@@ -31,7 +31,7 @@ readn(int fd, void *p, uint in_n)
 	int n;
 	uint8 *buf = p;
 	int i, j;
-	uint8 local_buf[256];
+	uint8 local_buf[RCALLMAX * 2];
 
 #ifdef	CC1111
 	n = in_n * 2;
@@ -65,6 +65,34 @@ readn(int fd, void *p, uint in_n)
 #endif
 
 	return q;
+}
+
+ssize_t
+writen(int fd, const void *buf, size_t n)
+{
+#ifdef  CC1111
+        int i;
+        int nw;
+        char buf_ascii[RCALLMAX * 2];
+        char *buf_byte = (char *)buf;
+
+        for (i = 0; i < n; i++) {
+                to_hex8_ascii(&buf_ascii[i * 2], buf_byte[i]);
+        }
+
+        nw = write(fd, buf_ascii, n * 2);
+
+        if (nw < 0) {
+                return -1;
+        } else if (nw != n * 2) {
+                errno = EIO;
+                return -1;
+        }
+
+        return n;
+#else
+        return (write(fd, buf, n));
+#endif
 }
 
 

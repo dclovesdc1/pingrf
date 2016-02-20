@@ -40,11 +40,13 @@ registers = [
 ]
 
 def p(d):
-  d.setFreq(913979004, mhz=26)
+  d.setFreq(913988708)
   d.setMdmModulation(MOD_2FSK)
   d.setMdmSyncWord(0xd391)
-  d.setMdmDeviatn(24414, mhz=26)
-  d.setMdmDRate(19191.7, mhz=26)
+  d.setMdmDeviatn(15869.141)
+  d.setMdmDRate(19191.7)
+  d.setMdmChanBW(101562.500)
+  d.setMdmChanSpc(304687.500)
   d.makePktFLEN(78)
 
 
@@ -53,7 +55,9 @@ def p(d):
 def main(args):
   d = RfCat()
   p(d)
-  
+ 
+  d.printRadioConfig()
+ 
   d.getRadioConfig()
   c = d.radiocfg
   
