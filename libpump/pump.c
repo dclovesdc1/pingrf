@@ -58,6 +58,54 @@ pstat(Pstat *ps)
 }
 
 int
+pstat_iob(Pstat *ps)
+{
+	static Pcall tx, rx;
+
+	memset(ps, 0, sizeof *ps);
+
+	if(_presume() < 0)
+		return -1;
+
+	tx.type = Tstatus2;
+	if(_pcall(&tx, &rx) != 1)
+		return -1;
+
+	/* XXX last bolus time */
+
+	ps->lastbolus = rx.status2.bolus;
+	ps->iob = rx.status2.iob;
+
+	_padjourn();
+
+	return 0;
+}
+
+int
+pstat_basal(Pstat *ps)
+{
+	static Pcall tx, rx;
+
+	memset(ps, 0, sizeof *ps);
+
+	if(_presume() < 0)
+		return -1;
+
+	tx.type = Tstatus;
+	if(_pcall(&tx, &rx) != 1)
+		return -1;
+
+	ps->basal = rx.status.basal;
+	
+	if(rx.flag&Fwarn)
+		ps->haswarning = 1;
+	
+	_padjourn();
+
+	return 0;
+}
+
+int
 pbolus(uint insulin, uint minutes)
 {
 	static Pcall tx, rx;

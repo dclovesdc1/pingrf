@@ -35,6 +35,25 @@ void putchar(char c);
 
 void srvprintstate();
 
+void wd_init()
+{
+	WDCTL = WDCTL | WDCTL_EN;
+}
+
+void wd_reset()
+{
+	uint8 wdctl1;
+	uint8 wdctl2;
+
+	wdctl1 = WDCTL;
+	wdctl1 &= ~WDCTL_CLR;
+	wdctl2 = wdctl1 | WDCTL_CLR2 | WDCTL_CLR0;
+	wdctl1 |= WDCTL_CLR3 | WDCTL_CLR1;
+
+	WDCTL = wdctl1;
+	WDCTL = wdctl2;
+}
+
 void
 main(void)
 {
@@ -79,8 +98,12 @@ main(void)
 
 	dprint("pingrf started.\n");
 
+	wd_init();
+
 	srvrx();
 	for(;;){
+		wd_reset();
+
 		if(flag&Fpanic){
 			GREEN = 0;
 			RED = 0;

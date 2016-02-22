@@ -13,7 +13,7 @@ char *argv0;
 /* char *ttypath = "/dev/tty.usbserial"; */
 /* char *ttypath = "/dev/cu.usbserial-AH03IMYO"; */
 //char *ttypath = "/dev/ttyUSB0";
-char *ttypath = "/dev/ttyACM0";
+char *ttypath = "/dev/ttyACM1";
 speed_t ttybaud = 19200;
 int tty;
 int debug = 0;
@@ -108,6 +108,28 @@ main(int argc, char **argv)
 		print("crc32(%s) = %8ux\n", argv[1], crc32(buf, n));
 	}else if(strcmp(argv[0], "ping") == 0){
 		ping();
+	}else if(strcmp(argv[0], "BASAL") == 0){
+		Pstat ps;
+
+		if (pstat_basal(&ps) < 0)
+			panic("pstat_iob: %r");
+
+		print("	Basal: %uF\n", ps.basal);
+
+		if(ps.haswarning) {
+			print("	WARNING ACTIVE; clearing\n");
+			if(pclearwarning0() < 0)
+				print("failed to clear0");
+			if(pclearwarning1() < 0)
+				print("failed to clear1");
+		}
+	}else if(strcmp(argv[0], "IOB") == 0){
+		Pstat ps;
+
+		if (pstat_iob(&ps) < 0)
+			panic("pstat_iob: %r");
+
+		print("	IOB: %uF\n", ps.iob);
 	}else if(strcmp(argv[0], "stat") == 0){
 		Pstat ps;
 		
