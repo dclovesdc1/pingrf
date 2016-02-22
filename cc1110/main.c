@@ -194,9 +194,10 @@ main(void)
 Rcall*
 peekcall()
 {
+	srvrxpeek();
+
 	if(curcall.type == Nop && (flag&Frxcall)){
-		if (srvrxlower() != 0)
-			return &curcall;
+		srvrxlower();
 
 		flag &= ~Frxcall;
 

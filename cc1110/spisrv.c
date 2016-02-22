@@ -85,10 +85,14 @@ srvtx()
 }
 
 void
+srvrxpeek()
+{
+}
+
+void
 srvrxlower()
 {
 	unstuff(rxh, rxcall, nrx);
-	return 0;
 }
 
 void

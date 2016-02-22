@@ -60,10 +60,14 @@ srvrx()
 //	U0CSR |= U0CSR_RE;
 }
 
-int
+void
+srvrxpeek()
+{
+}
+
+void
 srvrxlower()
 {
-	return 0;
 }
 
 void

@@ -6,15 +6,25 @@
 /*
 */
 
+enum
+{
+	Uidle,
+	Uready,
+	Urxing
+};
+
 static volatile uint8 nrx, ntx;
+static volatile uint8 rxstate;
 
 void
 srvinit()
 {
-  usb_init( );
-  usb_enable( );
-  usb_up( );
-  usb_flush( );
+	usb_init( );
+	usb_enable( );
+	usb_up( );
+	usb_flush( );
+
+	rxstate = Uidle;
 }
 
 void
@@ -22,15 +32,19 @@ srvrx()
 {
 	flag &= ~Frxcall;
 	nrx = 0;
+        rxstate = Uready;
 }
 
 int
-srvrxlower()
+srvrxpeek()
 {
 	uint8_t length;
 	uint8_t in_byte;
 	char nibbles[2];
 	int bytes_to_read;
+
+	if (rxstate != Urxing)
+		return;
 
 	nibbles[0] = usb_getchar();
 	nibbles[1] = usb_getchar();
@@ -39,14 +53,17 @@ srvrxlower()
 	if (nrx == 0) {
 		if (in_byte == 0) {
 			dprint("getting 0 size. error\n");
+			while (1) {;}
+        		rxstate = Uready;
 			flag &= ~Frxcall;
-			return -1;
+			return;
 		}
 
 		if (in_byte == 0xff) {
 			dprint("radio reset\n");
+        		rxstate = Uready;
 			flag &= ~Frxcall;
-			return -2;
+			return;
 		}
 
 		// if the index is still at 0, here is the length
@@ -65,22 +82,26 @@ srvrxlower()
 	}
 
 	if (nrx == length) {
+		rxstate = Uidle;
 		flag |= Frxcall;
 	}
-
-	return 0;
 }
 
 void
 srvpending()
 {
-	flag |= Frxcall;
+	if(rxstate == Uidle)
+		return; /* TODO: panic? */
+
+	if(rxstate == Uready){
+		rxstate = Urxing;
+        }
 }
 
-//void
-//srvrxlower()
-//{
-//}
+void
+srvrxlower()
+{
+}
 
 void
 srvtx()

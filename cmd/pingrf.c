@@ -13,7 +13,7 @@ char *argv0;
 /* char *ttypath = "/dev/tty.usbserial"; */
 /* char *ttypath = "/dev/cu.usbserial-AH03IMYO"; */
 //char *ttypath = "/dev/ttyUSB0";
-char *ttypath = "/dev/ttyACM1";
+char *ttypath = "/dev/ttyACM0";
 speed_t ttybaud = 19200;
 int tty;
 int debug = 0;
