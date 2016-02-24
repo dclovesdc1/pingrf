@@ -3,8 +3,8 @@
 enum
 {
 #ifdef	CC1111
-	Hz = 187500, // 48e6/128/2
-	Khz = 188, 	// 48e3/128/2
+	Hz = 93750, // 24e6/128/2
+	Khz = 94, 	// 24e3/128/2
 #else
 	Hz = 101563, // 26e6/128/2
 	Khz = 102, 	// 26e3/128/2
@@ -51,7 +51,7 @@ alarm(uint16 ms)
 		T1CC0L = 0xff;
 	}else{
 		T1CC0H = ticks >> 8;
-		T1CC0H = ticks & 0xff;
+		T1CC0L = ticks & 0xff;
 	}
 
 	T1CCTL0 = 0x44;

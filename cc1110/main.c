@@ -158,6 +158,8 @@ main(void)
 		#ifdef DEBUG
 		if((i++%100000 == 0) || (flag != lastflag || state != laststate | lastMARCSTATE != MARCSTATE)){
 //__critical {
+			wd_reset();
+
 			switch(state){
 			case Idle: 
 				dprint("idle"); break;
