@@ -46,9 +46,14 @@ srvrxpeek()
 	if (rxstate != Urxing)
 		return;
 
+	dprint("start of reading ---- ");
+
 	nibbles[0] = usb_getchar();
+	dprint("%c ", nibbles[0]);
 	nibbles[1] = usb_getchar();
+	dprint("%c ", nibbles[1]);
 	in_byte = hex8(&nibbles[0]);
+	dprint("(%x) ", in_byte);
 
 	if (nrx == 0) {
 		if (in_byte == 0) {
@@ -73,8 +78,11 @@ srvrxpeek()
 	length = rxcall[0];
 	while (nrx < length) {
 		nibbles[0] = usb_getchar();
+		dprint("%c ", nibbles[0]);
 		nibbles[1] = usb_getchar();
+		dprint("%c ", nibbles[1]);
 		in_byte = hex8(&nibbles[0]);
+		dprint("(%x) ", in_byte);
 
 		rxcall[nrx++] = in_byte;
 		if(nrx == sizeof rxcall)
@@ -84,6 +92,12 @@ srvrxpeek()
 	if (nrx == length) {
 		rxstate = Uidle;
 		flag |= Frxcall;
+		dprint(" ---- read %d\n", length);
+	} else {
+		// if we didn't read everything, let's let
+		// WD take over here
+		dprint(" ---- only read %d out of %d\n", nrx, length);
+		while (1) {;}
 	}
 }
 

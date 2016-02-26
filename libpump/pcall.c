@@ -55,7 +55,11 @@ _pcall(Pcall *tx, Pcall *rx)
 	default:
 		preamblems = 0;
 		timeoutms = 500;
+#ifdef	CC1111
+		tries = 5;
+#else
 		tries = 3;
+#endif
 		break;
 	}
 
@@ -67,7 +71,11 @@ _pcall(Pcall *tx, Pcall *rx)
 		 * for the given number of milliseconds; we comply. */
 		taskdelay(rx->backoffms);
 		tx1.type = Tkeepalive;
+#ifdef	CC1111
+		if((rv=_pcall1(&tx1, rx, timeoutms*2, 0, 5)) != 1)
+#else
 		if((rv=_pcall1(&tx1, rx, timeoutms*2, 0, 2)) != 1)
+#endif
 			return rv;
 	}
 
@@ -122,10 +130,13 @@ _ptxrx(Pcall *ptx, Pcall *prx, uint16 timeoutms, uint16 preamblems)
 			return -1;
 	
 		if(rx.type == Rerr){
-			if(rx.err == Etimeout)
+			if(rx.err == Etimeout) {
+				werrstr("time out");
 				return 0;
-			else
+			} else {
+				werrstr("unknown err");
 				return -1;
+			}
 		}
 
 		if(convP2C(rx.pkt, prx) < 0)
