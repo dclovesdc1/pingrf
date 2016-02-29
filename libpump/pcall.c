@@ -44,7 +44,11 @@ _pcall(Pcall *tx, Pcall *rx)
 	case Twakeup:
 		preamblems = 2000;
 		timeoutms = 200;
+#ifdef	CC1111
+		tries = 7;
+#else
 		tries = 5;
+#endif
 		break;
 
 	case Tadjourn:
@@ -56,7 +60,7 @@ _pcall(Pcall *tx, Pcall *rx)
 		preamblems = 0;
 		timeoutms = 500;
 #ifdef	CC1111
-		tries = 5;
+		tries = 7;
 #else
 		tries = 3;
 #endif
@@ -72,7 +76,7 @@ _pcall(Pcall *tx, Pcall *rx)
 		taskdelay(rx->backoffms);
 		tx1.type = Tkeepalive;
 #ifdef	CC1111
-		if((rv=_pcall1(&tx1, rx, timeoutms*2, 0, 5)) != 1)
+		if((rv=_pcall1(&tx1, rx, timeoutms*2, 0, 7)) != 1)
 #else
 		if((rv=_pcall1(&tx1, rx, timeoutms*2, 0, 2)) != 1)
 #endif
