@@ -58,11 +58,12 @@ _pcall(Pcall *tx, Pcall *rx)
 
 	default:
 		preamblems = 0;
-		timeoutms = 500;
 #ifdef	CC1111
 		tries = 10;
+		timeoutms = 300;
 #else
 		tries = 3;
+		timeoutms = 500;
 #endif
 		break;
 	}
