@@ -153,6 +153,12 @@ pbolus(uint insulin, uint minutes)
 		break;
 	}
 
+	if (minutes == 0) {
+		tx.type = Tack3;
+		if(_pcall(&tx, &rx) != 1)
+			return -1;
+	}
+
 	_padjourn();
 
 	return 0;
