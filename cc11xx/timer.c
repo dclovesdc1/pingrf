@@ -61,9 +61,12 @@ t1intr(void) __interrupt T1_VECTOR
 	}else{
 		ticks -= 0xffff;
 
-		if(!(ticks>>16)){
+		if(ticks>>16){
+			T1CC0H = 0xff;
+			T1CC0L = 0xff;
+		}else{
 			T1CC0H = ticks >> 8;
-			T1CC0H = ticks & 0xff;
+			T1CC0L = ticks & 0xff;
 		}
 	}
 }

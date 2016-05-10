@@ -206,6 +206,13 @@ convC2P(Pcall *c, uint8 *ap/*[Npkt]]*/)
 	*p++ = c->tag;
 	*p++ = size;
 
+#if	0
+	/* simulate missing checksum */
+	if (c->type == Tcombo) {
+		print("pretend no checksum");
+		return -1;
+	}
+#endif
 	if(pumpchk(p-4, 4, &chk) < 0)
 		return -1;
 
@@ -219,10 +226,17 @@ convC2P(Pcall *c, uint8 *ap/*[Npkt]]*/)
 	default:	break;
 
 	case Twakeup:
+#if	0
 		*p++ = 0x49;
 		*p++ = 0x01;
 		*p++ = 0x2d;
 		*p++ = 0x14;
+#else
+		*p++ = 0x48;
+		*p++ = 0x00;
+		*p++ = 0x2f;
+		*p++ = 0x14;
+#endif
 		break;
 
 	case Tbolus:
@@ -248,8 +262,13 @@ convC2P(Pcall *c, uint8 *ap/*[Npkt]]*/)
 		break;
 
 	case Tclearwarn:
-		*p++ = 0xa7;
-		*p++ = 0x01;
+		if (c->warning.type == Twarning_0) {
+			*p++ = 0xa7;
+			*p++ = 0x01;
+		} else {
+			*p++ = 0xb0;
+			*p++ = 0x01;
+		}
 		break;
 	}
 	
