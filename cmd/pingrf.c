@@ -129,7 +129,7 @@ taskmain(int argc, char **argv)
 		if (pstat_basal(&ps) < 0)
 			panic("pstat_iob: %r");
 
-		print("	Basal: %uF\n", ps.basal);
+		print("	Basal: %.3uF\n", ps.basal);
 
 		if(ps.haswarning) {
 			print("	WARNING ACTIVE; clearing\n");
@@ -144,7 +144,7 @@ taskmain(int argc, char **argv)
 		if (pstat_iob(&ps) < 0)
 			panic("pstat_iob: %r");
 
-		print("	IOB: %uF\n", ps.iob);
+		print("	IOB: %.3uF\n", ps.iob);
 	}else if(strcmp(argv[0], "stat") == 0){
 		Pstat ps;
 		
