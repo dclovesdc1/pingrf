@@ -146,11 +146,8 @@ enum
 	Tdeliverystatus = 0x33,
 	Rdeliverystatus = Tdeliverystatus+0xff,
 	
-
-/*	This is some sort of delivery summary
 	Tack3 = 0x36,
 	Rack3 = Tack3+0xff,
-*/
 
 	Tbolus = 0x37,
 	Rbolus = Tbolus+0xff,
