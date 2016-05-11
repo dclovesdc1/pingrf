@@ -7,10 +7,6 @@ enum
 	Resetgpio
 };
 
-#ifdef	CC1111
-#include "intel_hex.h"
-#endif
-
 #define	BOLUS_INC_U	0.05
 #define BOLUS_INC_P	50
 
@@ -29,7 +25,6 @@ int reset;
 void usage();
 void opentty();
 
-ssize_t writen(int fd, const void *buf, size_t count); 
 int 	rcallwrite(void *p, uint n);
 void	chkadd(char *v, char *chk);
 void	call(int type);

@@ -73,14 +73,8 @@ srvrx()
 }
 
 void
-srvrxpeek()
-{
-}
-
-void
 srvrxlower()
-{
-}
+{/*no-op*/}
 
 void
 srvrxpeek()
