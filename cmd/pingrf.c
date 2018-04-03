@@ -145,6 +145,20 @@ taskmain(int argc, char **argv)
 			panic("pstat_iob: %r");
 
 		print("	IOB: %.3uF\n", ps.iob);
+	}else if(strcmp(argv[0], "COMBO") == 0){
+		Pstat ps;
+		
+		if(pstat_combo(&ps) < 0)
+			panic("pstat_combo: %r");
+		
+		if(ps.comboactive){
+			print("	Combo active %2d:%2d-%2d:%2d %.3uF/%.3uF\n", 
+				ps.combostarthour, ps.combostartminute,
+				ps.comboendhour, ps.comboendminute,
+				ps.combodelivered, ps.combototal);
+		}else{
+			print("	No combo active\n");
+		}
 	}else if(strcmp(argv[0], "stat") == 0){
 		Pstat ps;
 		

@@ -123,6 +123,39 @@ pstat_basal(Pstat *ps)
 }
 
 int
+pstat_combo(Pstat *ps)
+{
+	static Pcall tx, rx;
+
+	memset(ps, 0, sizeof *ps);
+
+	if(_presume() < 0)
+		return -1;
+
+	tx.type = Tstatus4;
+	if(_pcall(&tx, &rx) != 1)
+		return -1;
+	
+	ps->comboactive = rx.status4.active;
+	ps->comboyear = rx.status4.year;
+	ps->combomonth = rx.status4.month;
+	ps->comboday = rx.status4.day;
+	ps->combostarthour = rx.status4.starthour;
+	ps->combostartminute = rx.status4.startminute;
+	ps->comboendhour = rx.status4.endhour;
+	ps->comboendminute = rx.status4.endminute;
+	ps->combodelivered = rx.status4.delivered;
+	ps->combototal = rx.status4.total;
+
+	if(_preset() < 0)
+		return -1;
+
+	_padjourn();
+
+	return 0;
+}
+
+int
 pbolus(uint insulin, uint minutes)
 {
 	static Pcall tx, rx;
