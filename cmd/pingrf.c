@@ -73,6 +73,7 @@ taskmain(int argc, char **argv)
 	radio = "tty:";
 
 	fixfmtinstall();
+	hexfmtinstall();
 	fmtinstall('P', Pcallfmt);
 	fmtinstall('R', rcallfmt);
 
