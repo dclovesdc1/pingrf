@@ -85,6 +85,11 @@ typedef struct
 	uint minutes;
 } Mbolus;
 
+typedef struct
+{
+	uint type;
+} Mwarning;
+
 enum
 {
 	Eok = 0,
@@ -141,11 +146,8 @@ enum
 	Tdeliverystatus = 0x33,
 	Rdeliverystatus = Tdeliverystatus+0xff,
 	
-
-/*	This is some sort of delivery summary
 	Tack3 = 0x36,
 	Rack3 = Tack3+0xff,
-*/
 
 	Tbolus = 0x37,
 	Rbolus = Tbolus+0xff,
@@ -168,6 +170,12 @@ enum
 	Fwarn = 1
 };
 
+enum
+{
+	Twarning_0 = 0,
+	Twarning_1 = 1,
+};
+
 typedef struct
 {
 	int type;
@@ -187,6 +195,7 @@ typedef struct
 		Mbolus bolus;
 		uint16 backoffms;		/* Rkeepalive */
 		uint deliverystatus;		/* Rdeliverystatus */
+		Mwarning warning;
 	};
 } Pcall;
 

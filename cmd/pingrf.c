@@ -7,11 +7,15 @@ enum
 	Resetgpio
 };
 
+#define	BOLUS_INC_U	0.05
+#define BOLUS_INC_P	50
+
 char *argv0;
 
 #if 0
 /* char *ttypath = "/dev/tty.usbserial"; */
 /* char *ttypath = "/dev/cu.usbserial-AH03IMYO"; */
+/* char *ttypath = "/dev/serial/by-id/usb-Nightscout_subg_rfspy_000002-if00"; */
 char *ttypath = nil;
 speed_t ttybaud = B19200;
 #endif 
@@ -69,6 +73,7 @@ taskmain(int argc, char **argv)
 	radio = "tty:";
 
 	fixfmtinstall();
+	hexfmtinstall();
 	fmtinstall('P', Pcallfmt);
 	fmtinstall('R', rcallfmt);
 
@@ -119,6 +124,42 @@ taskmain(int argc, char **argv)
 		print("crc32(%s) = %8ux\n", argv[1], crc32(buf, n));
 	}else if(strcmp(argv[0], "ping") == 0){
 		ping();
+	}else if(strcmp(argv[0], "BASAL") == 0){
+		Pstat ps;
+
+		if (pstat_basal(&ps) < 0)
+			panic("pstat_iob: %r");
+
+		print("	Basal: %.3uF\n", ps.basal);
+
+		if(ps.haswarning) {
+			print("	WARNING ACTIVE; clearing\n");
+			if(pclearwarning0() < 0)
+				print("failed to clear0");
+			if(pclearwarning1() < 0)
+				print("failed to clear1");
+		}
+	}else if(strcmp(argv[0], "IOB") == 0){
+		Pstat ps;
+
+		if (pstat_iob(&ps) < 0)
+			panic("pstat_iob: %r");
+
+		print("	IOB: %.3uF\n", ps.iob);
+	}else if(strcmp(argv[0], "COMBO") == 0){
+		Pstat ps;
+		
+		if(pstat_combo(&ps) < 0)
+			panic("pstat_combo: %r");
+		
+		if(ps.comboactive){
+			print("	Combo active %2d:%2d-%2d:%2d %.3uF/%.3uF\n", 
+				ps.combostarthour, ps.combostartminute,
+				ps.comboendhour, ps.comboendminute,
+				ps.combodelivered, ps.combototal);
+		}else{
+			print("	No combo active\n");
+		}
 	}else if(strcmp(argv[0], "stat") == 0){
 		Pstat ps;
 		
@@ -142,19 +183,32 @@ taskmain(int argc, char **argv)
 		}else{
 			print("	No combo active\n");
 		}
-		if(ps.haswarning)
-			print("	WARNING ACTIVE\n");
+		if(ps.haswarning) {
+			print("	WARNING ACTIVE; clearing\n");
+			if(pclearwarning0() < 0)
+				print("failed to clear0");
+			if(pclearwarning1() < 0)
+				print("failed to clear1");
+		}
 	}else if(strcmp(argv[0], "clearwarning") == 0){
-		if(pclearwarning() < 0)
-			panic("pclearwarning: %r");
+		if(pclearwarning0() < 0)
+			panic("pclearwarning0: %r");
+		if(pclearwarning1() < 0)
+			panic("pclearwarning1: %r");
 	}else if(strcmp(argv[0], "bolus") == 0){
 		if(argc != 3)
 			usage();
 
 		insulin = strtof(argv[1], nil);
 		hours = strtof(argv[2], nil);
-		
-		if(pbolus((uint)(insulin*1000.0), (uint)(hours*60)) < 0)
+	
+		uint multiples = (insulin / BOLUS_INC_U);
+		if (insulin - (multiples * BOLUS_INC_U) > BOLUS_INC_U / 2) {
+			multiples++;
+		}
+		uint bolus_p = multiples * BOLUS_INC_P;
+
+		if(pbolus(bolus_p, (uint)(hours*60)) < 0)
 			panic("pbolus: %r");
 
 		print("ok\n");

@@ -1,19 +1,11 @@
-ROOT := ../../
-
-S=$(GOPATH)/src
+ROOT := ../
 
 OBJ = pkg
 
 CODE_LOC :=
 CC = sdcc
-CFLAGS = --model-large --opt-code-size --std-c99
-LDFLAGS_FLASH = \
-	 --std-c99  \
-	--out-fmt-ihx \
-	--code-size 0x8000 \
-	--xram-loc 0xf000  \
-	--iram-size 0x100 \
-	--xram-size 0x0f00
+CFLAGS = --std-c99 --stack-auto
+LDFLAGS_FLASH = --xram-loc 0xf000
 
 CFLAGS += -I$(ROOT)/tiny9/8051/include
 CFLAGS += -I$(ROOT)/tiny9/include
@@ -40,11 +32,13 @@ vpath %.c .
 vpath %.c ..
 
 all:	$(OBJ)/cc1110dk.hex\
-	$(OBJ)/cc1110dk+debug.hex\
 	$(OBJ)/cc1111.hex\
-	$(OBJ)/cc1111+debug.hex\
 	$(OBJ)/cc1111+ccloader.hex\
 	$(OBJ)/erf.hex
+
+	# These are currently broken:
+	#	$(OBJ)/cc1110dk+debug.hex\
+	# $(OBJ)/cc1111+debug.hex\
 
 $(OBJ):
 	mkdir -p $@
@@ -113,11 +107,11 @@ $(OBJ)/erf.hex: $(addprefix $(OBJ)/erf/,$(erfrel) noprint.rel)
 
 %.flash: $(OBJ)/%.hex
 	cc-tool -v -e -w $<
-	
-%.load: $(OBJ)/%.ihx
-	./rfcat_bootloader /dev/tty.usbmodem000001 download $<
-	./rfcat_bootloader /dev/tty.usbmodem000001 verify $<
-	./rfcat_bootloader /dev/tty.usbmodem000001 run
+
+%.ys1load: $(OBJ)/%.ihx
+	./rfcat_bootloader /dev/RFCAT_BL_YS1 download $<
+	./rfcat_bootloader /dev/RFCAT_BL_YS1 verify $<
+	./rfcat_bootloader /dev/RFCAT_BL_YS1 run
 
 clean:
 	rm -rf $(OBJ)
